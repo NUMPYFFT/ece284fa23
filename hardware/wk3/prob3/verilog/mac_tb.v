@@ -60,18 +60,43 @@ function [3:0] w_bin ;
 endfunction
 
 
-
+// unsigned
 function [3:0] x_bin ;
+  input integer activation;
+  begin
+    if (activation > 7) begin
+      x_bin[3] = 1;
+      activation = activation - 8;
+    end
+    else
+      x_bin[3] = 0;
+    
+    if (activation > 3) begin
+      x_bin[2] = 1;
+      activation = activation - 4
+    end
+    else
+      x_bin[2] = 0;
 
-...
-
+    if (activation > 1)
+      x_bin[1] = 1;
+    else
+      x_bin[1] = 0;
+  end
 endfunction
 
 
 // Below function is for verification
 function [psum_bw-1:0] mac_predicted;
-  
-...
+  parameter bw = 4;
+  parameter psum_bw = 16;
+  input signed [bw-1:0] a;
+  input unsigned [bw-1:0] b;
+  input [psum_bw-1:0] c;
+
+  begin
+      mac_predicted = a * b + c;
+  end
 
 endfunction
 
@@ -83,7 +108,7 @@ mac_wrapper #(.bw(bw), .psum_bw(psum_bw)) mac_wrapper_instance (
         .b(b),
         .c(c),
 	.out(out)
-); 
+);
  
 
 initial begin 
