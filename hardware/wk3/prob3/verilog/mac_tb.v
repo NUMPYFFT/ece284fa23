@@ -60,8 +60,8 @@ function [3:0] w_bin ;
 endfunction
 
 
-// unsigned
-function [3:0] x_bin ;
+/// unsigned
+function [3:0] x_bin;
   input integer activation;
   begin
     if (activation > 7) begin
@@ -73,31 +73,40 @@ function [3:0] x_bin ;
     
     if (activation > 3) begin
       x_bin[2] = 1;
-      activation = activation - 4
+      activation = activation - 4;
     end
     else
       x_bin[2] = 0;
 
-    if (activation > 1)
+    if (activation > 1) begin
       x_bin[1] = 1;
+      activation = activation - 2;
+    end
     else
       x_bin[1] = 0;
+
+    if (activation > 0) begin
+      x_bin[0] = 1;
+      activation = activation - 1;
+    end
+    else
+      x_bin[0] = 0;
   end
 endfunction
 
 
 // Below function is for verification
 function [psum_bw-1:0] mac_predicted;
-  parameter bw = 4;
-  parameter psum_bw = 16;
-  input signed [bw-1:0] a;
-  input unsigned [bw-1:0] b;
-  input [psum_bw-1:0] c;
+  input unsigned [bw-1:0] a;
+  input signed [bw-1:0] b;
+  input signed [psum_bw-1:0] c;
+  reg signed [2*bw-1:0] product;
+  reg signed [psum_bw-1:0] psum;
 
   begin
-      mac_predicted = a * b + c;
+    product = {{bw{1'b0}}, a} * {{bw{b[bw-1]}}, b};
+    mac_predicted = product + c;
   end
-
 endfunction
 
 
@@ -113,8 +122,8 @@ mac_wrapper #(.bw(bw), .psum_bw(psum_bw)) mac_wrapper_instance (
 
 initial begin 
 
-  w_file = $fopen("b_data.txt", "r");  //weight data
-  x_file = $fopen("a_data.txt", "r");  //activation
+  w_file = $fopen("b_data.txt", "r");  //weight data, signed
+  x_file = $fopen("a_data.txt", "r");  //activation, unsigned
 
   $dumpfile("mac_tb.vcd");
   $dumpvars(0,mac_tb);
