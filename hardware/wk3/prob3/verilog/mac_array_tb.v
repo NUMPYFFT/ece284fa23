@@ -1,6 +1,7 @@
 // Created by prof. Mingu Kang @VVIP Lab in UCSD ECE department
 // Please do not spread this code without permission 
 
+
 module mac_array_tb;
 
 parameter bw = 4;
@@ -94,18 +95,29 @@ endfunction
 
 
 // Below function is for verification
-function [psum_bw-1:0] mac_predicted;
-  input unsigned [bw-1:0] a;
-  input signed [bw-1:0] b;
-  input signed [psum_bw-1:0] c;
-  reg signed [2*bw-1:0] product;
-  reg signed [psum_bw-1:0] psum;
+function [psum_bw-1:0] mac_array_predicted;
+  input unsigned [3:0][bw-1:0] x; // Four 4-bit numbers a0 to a3
+  input signed [3:0][bw-1:0] w;   // Four 4-bit numbers b0 to b3
+  input signed [psum_bw-1:0] psum_in;
+  
+  reg signed [2*bw-1:0] product0, product1, product2, product3;
+  reg signed [psum_bw-1:0] sum0, sum1;
 
   begin
-    product = {{bw{1'b0}}, a} * {{bw{b[bw-1]}}, b};
-    mac_predicted = product + c;
+    product0 = {{bw{1'b0}}, x[0]} * {{bw{w[0][bw-1]}}, w[0]};
+    product1 = {{bw{1'b0}}, x[1]} * {{bw{w[1][bw-1]}}, w[1]};
+    product2 = {{bw{1'b0}}, x[2]} * {{bw{w[2][bw-1]}}, w[2]};
+    product3 = {{bw{1'b0}}, x[3]} * {{bw{w[3][bw-1]}}, w[3]};
+
+    sum0 = product0 + product1;
+    sum1 = product2 + product3;
+    mac_array_predicted = sum0 + sum1 + psum_in;
   end
 endfunction
+
+
+
+reg [psum_bw-1:0] predicted_psum;
 
 mac_array mac_array_instance (
     .clk(clk),
@@ -142,6 +154,16 @@ initial begin
         w[u] = w_bin(w_dec[u]); // signed number
      end
      psum_in = psum_out;
+
+     // Using mac_predicted function to get predicted value
+     
+     predicted_psum = mac_array_predicted(x, w, psum_in);
+
+     // Optionally, you can compare or display the predicted value
+     // Example:
+     if (predicted_psum != psum_out) begin
+         $display("Mismatch at i=%d: Predicted: %d, Actual: %d", i, predicted_psum, psum_out);
+     end
   end
 
   #1 clk = 1'b1;
@@ -151,5 +173,6 @@ initial begin
 
   #10 $finish;
 end
+
 
 endmodule
