@@ -1,6 +1,3 @@
 ./verilog/mac.v
 ./verilog/mac_tb.v
 ./verilog/mac_wrapper.v
-./verilog/mac_array.v
-./verilog/mac_array_tb.v
-./verilog/mac_wrapper.v
