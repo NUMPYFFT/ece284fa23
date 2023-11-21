@@ -9,6 +9,7 @@ __pycache__/
 # Ignored files and patterns
 *.log
 *.DS_Store
+.data
 
 # Distribution / packaging
 .Python
